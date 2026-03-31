@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ISI® Elite — Platform Intelligence Dashboard</title>
+<style>
+  /* ============================================================
+     DESIGN SYSTEM — ISI® Elite Training DevOps Dashboard
+     Aesthetic: Industrial terminal meets premium athletic brand
+     Font: JetBrains Mono + Barlow Condensed
+  ============================================================ */
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;700&family=Barlow+Condensed:wght@300;400;600;800&display=swap');
+
+  :root {
+    --bg-base:      #0a0b0d;
+    --bg-panel:     #111318;
+    --bg-card:      #181c24;
+    --bg-hover:     #1e2330;
+    --border:       #252b38;
+    --border-glow:  #2e3a52;
+
+    --accent:       #e8ff47;   /* ISI® electric yellow */
+    --accent-dim:   #b8cc2a;
+    --accent-bg:    rgba(232,255,71,0.06);
+
+    --red:          #ff4444;
+    --red-dim:      #cc2222;
+    --red-bg:       rgba(255,68,68,0.08);
+
+    --green:        #39ff6e;
+    --green-dim:    #22aa44;
+    --green-bg:     rgba(57,255,110,0.07);
+
+    --blue:         #5bb8ff;
+    --blue-dim:     #2266aa;
+    --blue-bg:      rgba(91,184,255,0.07);
+
+    --orange:       #ff8c42;
+    --purple:       #a855f7;
+
+    --text-primary: #e8eaf0;
+    --text-secondary:#8a92a8;
+    --text-dim:     #4a5268;
+
+    --font-mono:    'JetBrains Mono', monospace;
+    --font-display: 'Barlow Condensed', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    background: var(--bg-base);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+
+  /* ── SCROLLBARS ── */
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-glow); border-radius: 2px; }
+
+  /* ── TOP BAR ── */
+  #topbar {
+    height: 48px;
+    background: var(--bg-panel);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 24px;
+    position: relative;
+    z-index: 100;
+  }
+
+  #topbar .brand {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--accent);
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+  #topbar .brand span { color: var(--text-secondary); font-weight: 300; }
+
+  #topbar .tagline {
+    font-size: 10px;
+    color: var(--text-dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    border-left: 1px solid var(--border);
+    padding-left: 24px;
+  }
+
+  .spacer { flex: 1; }
+
+  /* global stats in topbar */
+  .top-stat {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+  }
+  .top-stat .val {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+    font-family: var(--font-display);
+    letter-spacing: 0.04em;
+  }
+  .top-stat .lbl {
+    font-size: 9px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .top-divider {
+    width: 1px;
+    height: 28px;
+    background: var(--border);
+  }
+
+  /* status dot */
+  .status-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse-dot 2s ease-in-out infinite;
+  }
+  @keyframes pulse-dot {
+    0%,100% { opacity: 1; }
+    50%      { opacity: 0.4; }
+  }
+
+  /* ── MAIN LAYOUT ── */
+  #layout {
+    display: grid;
+    grid-template-columns: 220px 1fr 320px;
+    grid-template-rows: 1fr;
+    height: calc(100vh - 48px);
+    overflow: hidden;
+  }
+
+  /* ── PANELS ── */
+  .panel {
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .panel:last-child { border-right: none; }
+
+  .panel-header {
+    padding: 12px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--bg-panel);
+    flex-shrink: 0;
+  }
+  .panel-title {
+    font-family: var(--font-display);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+  }
+  .panel-badge {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+  }
+  .badge-green { background: var(--green-bg); color: var(--green); border: 1px solid rgba(57,255,110,0.2); }
+  .badge-yellow { background: var(--accent-bg); color: var(--accent); border: 1px solid rgba(232,255,71,0.2); }
+  .badge-red    { background: var(--red-bg); color: var(--red); border: 1px solid rgba(255,68,68,0.2); }
+  .badge-blue   { background: var(--blue-bg); color: var(--blue); border: 1px solid rgba(91,184,255,0.2); }
+
+  .panel-body { flex: 1; overflow-y: auto; }
+
+  /* ── LEFT — LOCATION LIST ── */
+  #loc-panel .panel-body { padding: 8px 0; }
+
+  .loc-item {
+    padding: 10px 16px;
+    cursor: pointer;
+    border-left: 2px solid transparent;
+    transition: all 0.15s ease;
+    position: relative;
+  }
+  .loc-item:hover {
+    background: var(--bg-hover);
+    border-left-color: var(--border-glow);
+  }
+  .loc-item.active {
+    background: var(--accent-bg);
+    border-left-color: var(--accent);
+  }
+  .loc-item .loc-name {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .loc-item.active .loc-name { color: var(--accent); }
+  .loc-item .loc-meta {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-top: 2px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .loc-item .loc-tier {
+    font-size: 9px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+  }
+  .loc-status-pill {
+    font-size: 8px;
+    padding: 1px 5px;
+    border-radius: 2px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .pill-open     { background: var(--green-bg); color: var(--green); }
+  .pill-presales { background: var(--accent-bg); color: var(--accent); }
+
+  /* ── CENTER — SCHEDULE PANEL ── */
+  #main-panel { border-right: none; }
+
+  /* action bar */
+  #action-bar {
+    padding: 10px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+    background: var(--bg-panel);
+    flex-wrap: wrap;
+    flex-shrink: 0;
+  }
+
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 6px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    cursor: pointer;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    transition: all 0.15s ease;
+    white-space: nowrap;
+  }
+  .btn-yellow {
+    background: var(--accent);
+    color: #0a0b0d;
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+  .btn-yellow:hover { background: #fff; border-color: #fff; }
+
+  .btn-ghost {
+    background: transparent;
+    color: var(--text-secondary);
+    border-color: var(--border);
+  }
+  .btn-ghost:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+  .btn-red {
+    background: var(--red-bg);
+    color: var(--red);
+    border-color: rgba(255,68,68,0.3);
+  }
+  .btn-red:hover { background: rgba(255,68,68,0.15); }
+
+  .btn-blue {
+    background: var(--blue-bg);
+    color: var(--blue);
+    border-color: rgba(91,184,255,0.3);
+  }
+  .btn-blue:hover { background: rgba(91,184,255,0.14); }
+
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* cache status bar */
+  #cache-bar {
+    padding: 7px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 10px;
+    color: var(--text-dim);
+    background: var(--bg-base);
+    flex-shrink: 0;
+  }
+  .cache-chip {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .cache-chip .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+  }
+  .dot-green  { background: var(--green); }
+  .dot-yellow { background: var(--accent); }
+  .dot-red    { background: var(--red); }
+  .dot-blue   { background: var(--blue); }
+  #cache-bar .chip-val { font-weight: 600; color: var(--text-secondary); }
+
+  /* main content area */
+  #main-content { padding: 16px; }
+
+  /* location header card */
+  #loc-header {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+  }
+  #loc-header .loc-icon {
+    width: 40px; height: 40px;
+    border-radius: 6px;
+    background: var(--accent-bg);
+    border: 1px solid rgba(232,255,71,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  #loc-header .loc-info { flex: 1; }
+  #loc-header .loc-title {
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: var(--text-primary);
+  }
+  #loc-header .loc-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+  #loc-header .loc-stats {
+    display: flex;
+    gap: 16px;
+    margin-top: 8px;
+  }
+  .mini-stat { display: flex; flex-direction: column; gap: 1px; }
+  .mini-stat .mv {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .mini-stat .ml {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+  }
+
+  /* request status */
+  #req-status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    font-size: 10px;
+    color: var(--text-dim);
+    height: 20px;
+  }
+  #req-status .rs-chip {
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-weight: 600;
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  /* schedule cards */
+  #schedule-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 8px;
+  }
+
+  .class-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 11px 13px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .class-card::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 2px;
+    background: var(--accent);
+    opacity: 0;
+    transition: opacity 0.15s;
+  }
+  .class-card:hover { border-color: var(--border-glow); background: var(--bg-hover); }
+  .class-card:hover::before { opacity: 1; }
+
+  .class-card .cc-time {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+  }
+  .class-card .cc-name {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    color: var(--text-primary);
+  }
+  .class-card .cc-trainer {
+    font-size: 10px;
+    color: var(--text-secondary);
+    margin-top: 3px;
+  }
+  .class-card .cc-spots {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+  .spots-bar-wrap {
+    flex: 1;
+    height: 3px;
+    background: var(--bg-base);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-right: 8px;
+  }
+  .spots-bar {
+    height: 100%;
+    border-radius: 2px;
+    background: var(--green);
+    transition: width 0.4s ease;
+  }
+  .spots-bar.warn { background: var(--orange); }
+  .spots-bar.full { background: var(--red); }
+  .spots-count {
+    font-size: 9px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+
+  .book-btn {
+    margin-top: 8px;
+    width: 100%;
+    padding: 5px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .book-btn:hover {
+    background: var(--accent);
+    color: #0a0b0d;
+    border-color: var(--accent);
+    font-weight: 700;
+  }
+
+  /* fallback / loading states */
+  .skeleton {
+    background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-hover) 50%, var(--bg-card) 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.4s ease infinite;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+  }
+  @keyframes skeleton-shimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+  }
+  .skeleton-card { height: 130px; }
+
+  /* fallback notice */
+  .fallback-notice {
+    background: var(--red-bg);
+    border: 1px solid rgba(255,68,68,0.25);
+    border-radius: 5px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 11px;
+    color: var(--red);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* ── RIGHT — LOG PANEL ── */
+  #log-panel { background: var(--bg-base); }
+
+  #log-controls {
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    background: var(--bg-panel);
+    flex-shrink: 0;
+  }
+
+  .filter-btn {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    padding: 3px 8px;
+    border-radius: 3px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    letter-spacing: 0.08em;
+    transition: all 0.12s;
+  }
+  .filter-btn.active {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+    border-color: var(--border-glow);
+  }
+
+  #log-list { padding: 6px 0; }
+
+  .log-entry {
+    padding: 4px 12px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    border-bottom: 1px solid rgba(37,43,56,0.5);
+    animation: log-slide 0.2s ease;
+    font-size: 10.5px;
+    line-height: 1.4;
+  }
+  @keyframes log-slide {
+    from { opacity: 0; transform: translateX(6px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .log-time {
+    color: var(--text-dim);
+    white-space: nowrap;
+    flex-shrink: 0;
+    font-size: 9px;
+    margin-top: 1px;
+  }
+  .log-icon { flex-shrink: 0; width: 12px; text-align: center; font-size: 11px; }
+  .log-msg  { color: var(--text-secondary); flex: 1; }
+  .log-msg .hi-green  { color: var(--green); font-weight: 500; }
+  .log-msg .hi-yellow { color: var(--accent); font-weight: 500; }
+  .log-msg .hi-red    { color: var(--red); font-weight: 500; }
+  .log-msg .hi-blue   { color: var(--blue); font-weight: 500; }
+  .log-msg .hi-purple { color: var(--purple); font-weight: 500; }
+  .log-msg .hi-orange { color: var(--orange); font-weight: 500; }
+
+  /* CMS panel */
+  #cms-panel {
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+    padding: 12px 16px;
+    flex-shrink: 0;
+  }
+  .cms-title {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    margin-bottom: 8px;
+  }
+  .cms-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin-bottom: 8px;
+  }
+  .cms-field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .cms-field label {
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+  .cms-field input, .cms-field select {
+    background: var(--bg-base);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 4px 7px;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  .cms-field input:focus, .cms-field select:focus {
+    border-color: var(--accent);
+  }
+  .cms-field select option {
+    background: var(--bg-card);
+  }
+
+  /* spike progress */
+  #spike-bar-wrap {
+    display: none;
+    margin: 8px 16px 0;
+    height: 3px;
+    background: var(--bg-card);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  #spike-bar {
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: width 0.2s ease;
+    width: 0%;
+  }
+
+  /* tracking panel at bottom of right panel */
+  #tracking-panel {
+    border-top: 1px solid var(--border);
+    padding: 8px 12px;
+    background: var(--bg-panel);
+    flex-shrink: 0;
+  }
+  .tracking-title {
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  #tracking-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    max-height: 52px;
+    overflow: hidden;
+  }
+  .track-pill {
+    font-size: 9px;
+    padding: 2px 7px;
+    border-radius: 10px;
+    border: 1px solid rgba(168,85,247,0.25);
+    background: rgba(168,85,247,0.07);
+    color: var(--purple);
+    white-space: nowrap;
+    animation: pill-pop 0.2s ease;
+  }
+  @keyframes pill-pop {
+    from { transform: scale(0.7); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  /* presales overlay */
+  .presales-overlay {
+    background: var(--accent-bg);
+    border: 1px solid rgba(232,255,71,0.2);
+    border-radius: 6px;
+    padding: 20px;
+    text-align: center;
+    margin: 8px 0;
+  }
+  .presales-overlay .po-title {
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 0.05em;
+  }
+  .presales-overlay .po-sub {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+
+  /* counters in topbar */
+  #total-requests { color: var(--accent); }
+  #total-cached   { color: var(--green); }
+  #total-errors   { color: var(--red); }
+
+  /* tooltip on hover for log entries */
+  .log-entry:hover { background: rgba(255,255,255,0.02); }
+
+  /* empty state */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 8px;
+    color: var(--text-dim);
+    padding: 40px;
+    text-align: center;
+  }
+  .empty-icon { font-size: 32px; opacity: 0.4; }
+  .empty-text { font-size: 11px; line-height: 1.6; }
+
+  /* responsive adjustments */
+  @media (max-width: 900px) {
+    #layout { grid-template-columns: 180px 1fr 260px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─────────── TOP BAR ─────────── -->
+<div id="topbar">
+  <div class="brand">ISI® <span>Elite Training</span></div>
+  <div class="tagline">Platform Intelligence Dashboard · v3.0</div>
+  <div class="spacer"></div>
+
+  <div class="top-stat">
+    <div class="val" id="total-requests">0</div>
+    <div class="lbl">API Requests</div>
+  </div>
+  <div class="top-divider"></div>
+  <div class="top-stat">
+    <div class="val" id="total-cached">0</div>
+    <div class="lbl">Cache Hits</div>
+  </div>
+  <div class="top-divider"></div>
+  <div class="top-stat">
+    <div class="val" id="total-errors">0</div>
+    <div class="lbl">API Errors</div>
+  </div>
+  <div class="top-divider"></div>
+  <div class="status-dot" title="System Online"></div>
+</div>
+
+<!-- ─────────── MAIN LAYOUT ─────────── -->
+<div id="layout">
+
+  <!-- LEFT: LOCATION SIDEBAR -->
+  <div class="panel" id="loc-panel">
+    <div class="panel-header">
+      <div class="panel-title">Locations</div>
+      <div class="panel-badge badge-green" id="open-count">— Open</div>
+    </div>
+    <div class="panel-body" id="loc-list"></div>
+  </div>
+
+  <!-- CENTER: MAIN SCHEDULE PANEL -->
+  <div class="panel" id="main-panel" style="border-right:1px solid var(--border);">
+    <div class="panel-header">
+      <div class="panel-title">Class Schedule</div>
+      <div id="panel-status-badge" class="panel-badge badge-blue">No Location Selected</div>
+    </div>
+
+    <div id="action-bar">
+      <button class="btn btn-yellow" id="btn-fetch" onclick="fetchCurrentLocation()">⚡ Fetch Schedule</button>
+      <button class="btn btn-ghost"  id="btn-spike" onclick="simulateTrafficSpike()">📊 Traffic Spike (×20)</button>
+      <button class="btn btn-blue"   id="btn-cms"   onclick="openCmsPanel()">🗂 Update CMS</button>
+      <button class="btn btn-red"    id="btn-clear-cache" onclick="clearCache()">🗑 Clear Cache</button>
+    </div>
+
+    <div id="spike-bar-wrap"><div id="spike-bar"></div></div>
+
+    <!-- Cache indicator bar -->
+    <div id="cache-bar">
+      <div class="cache-chip"><div class="dot dot-green"></div><span>HIT</span>: <span class="chip-val" id="stat-hit">0</span></div>
+      <div class="cache-chip"><div class="dot dot-yellow"></div><span>MISS</span>: <span class="chip-val" id="stat-miss">0</span></div>
+      <div class="cache-chip"><div class="dot dot-red"></div><span>EXPIRED</span>: <span class="chip-val" id="stat-exp">0</span></div>
+      <div class="cache-chip"><div class="dot dot-blue"></div><span>FALLBACK</span>: <span class="chip-val" id="stat-fb">0</span></div>
+      <div style="margin-left:auto;font-size:10px;" id="cache-size-label">Cache: 0 entries</div>
+    </div>
+
+    <div class="panel-body" id="main-content">
+      <div class="empty-state">
+        <div class="empty-icon">📍</div>
+        <div class="empty-text">Select a location from the left panel<br>to view real-time class schedules.</div>
+      </div>
+    </div>
+
+    <!-- CMS Inline Panel (hidden by default) -->
+    <div id="cms-panel" style="display:none;">
+      <div class="cms-title">✏ CMS — Edit Location Data</div>
+      <div class="cms-fields" id="cms-fields-container"></div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-yellow" onclick="saveCmsData()" style="font-size:10px;padding:5px 10px;">Save Changes</button>
+        <button class="btn btn-ghost"  onclick="closeCmsPanel()" style="font-size:10px;padding:5px 10px;">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: LOG PANEL -->
+  <div class="panel" id="log-panel">
+    <div class="panel-header">
+      <div class="panel-title">Live Event Log</div>
+      <div class="panel-badge badge-yellow" id="log-count">0 events</div>
+      <div style="margin-left:auto;">
+        <button class="btn btn-ghost" onclick="clearLogs()" style="font-size:9px;padding:2px 7px;">Clear</button>
+      </div>
+    </div>
+
+    <div id="log-controls">
+      <button class="filter-btn active" data-filter="all"     onclick="setFilter(this,'all')">ALL</button>
+      <button class="filter-btn"        data-filter="api"     onclick="setFilter(this,'api')">API</button>
+      <button class="filter-btn"        data-filter="cache"   onclick="setFilter(this,'cache')">CACHE</button>
+      <button class="filter-btn"        data-filter="track"   onclick="setFilter(this,'track')">TRACK</button>
+      <button class="filter-btn"        data-filter="error"   onclick="setFilter(this,'error')">ERROR</button>
+    </div>
+
+    <div class="panel-body" id="log-list"></div>
+
+    <!-- Tracking Events -->
+    <div id="tracking-panel">
+      <div class="tracking-title">
+        <span style="color:var(--purple);">●</span> GA4 Events — Last Fired
+      </div>
+      <div id="tracking-events"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ─────────── JAVASCRIPT ─────────── -->
+<script>
+/*
+ * ============================================================
+ *  ISI® Elite Training — Platform Intelligence Dashboard
+ *  Full simulation of multi-location Mindbody-like API system
+ *  with caching, rate limiting, fallback, and analytics.
+ * ============================================================
+ */
+
+/* ──────────────────────────────────────────────
+   1. CMS DATA — Mock locations & pricing tiers
+   (Equivalent to headless CMS content store)
+   ────────────────────────────────────────────── */
+const CMS = {
+  pricingTiers: {
+    'Tier 1': { monthly: 99,  initiation: 99,  annual: 999 },
+    'Tier 2': { monthly: 119, initiation: 129, annual: 1199 },
+    'Tier 3': { monthly: 139, initiation: 149, annual: 1399 },
+  },
+
+  locations: [
+    { id: 'loc_001', name: 'Raleigh — North Hills', city: 'Raleigh', state: 'NC', tier: 'Tier 1', status: 'open',     mindbody_site_id: 'MBO-101', members: 312 },
+    { id: 'loc_002', name: 'Charlotte — South End',  city: 'Charlotte', state: 'NC', tier: 'Tier 2', status: 'open',     mindbody_site_id: 'MBO-102', members: 487 },
+    { id: 'loc_003', name: 'Atlanta — Midtown',       city: 'Atlanta',   state: 'GA', tier: 'Tier 2', status: 'open',     mindbody_site_id: 'MBO-103', members: 401 },
+    { id: 'loc_004', name: 'Nashville — The Gulch',   city: 'Nashville', state: 'TN', tier: 'Tier 1', status: 'open',     mindbody_site_id: 'MBO-104', members: 276 },
+    { id: 'loc_005', name: 'Austin — Domain',         city: 'Austin',    state: 'TX', tier: 'Tier 3', status: 'open',     mindbody_site_id: 'MBO-105', members: 519 },
+    { id: 'loc_006', name: 'Denver — LoDo',           city: 'Denver',    state: 'CO', tier: 'Tier 2', status: 'open',     mindbody_site_id: 'MBO-106', members: 388 },
+    { id: 'loc_007', name: 'Tampa — Westshore',       city: 'Tampa',     state: 'FL', tier: 'Tier 1', status: 'presales', mindbody_site_id: 'MBO-107', members: 0   },
+    { id: 'loc_008', name: 'Phoenix — Scottsdale',    city: 'Scottsdale',state: 'AZ', tier: 'Tier 3', status: 'presales', mindbody_site_id: 'MBO-108', members: 0   },
+  ]
+};
+
+// Class types used to generate random schedules
+const CLASS_TYPES = [
+  'Power HIIT', 'Strength & Conditioning', 'Metabolic Circuit', 'Athletic Performance',
+  'Upper Body Blast', 'Total Body Burn', 'Core & Stability', 'Speed & Agility',
+];
+const TRAINERS = ['Coach Marcus', 'Coach Leah', 'Coach Darius', 'Coach Sofia', 'Coach James', 'Coach Nia'];
+const CLASS_TIMES = ['5:30 AM', '6:15 AM', '7:00 AM', '8:00 AM', '9:00 AM', '10:00 AM',
+                     '12:00 PM', '4:30 PM', '5:30 PM', '6:15 PM', '7:00 PM', '7:45 PM'];
+
+/* ──────────────────────────────────────────────
+   2. IN-MEMORY CACHE
+   TTL: 60 seconds per cache entry
+   ────────────────────────────────────────────── */
+const cache = {};          // key: locationId → { data, timestamp }
+const CACHE_TTL = 60000;   // 60 seconds in ms
+
+function getCached(locationId) {
+  const entry = cache[locationId];
+  if (!entry) return null;
+  const age = Date.now() - entry.timestamp;
+  if (age > CACHE_TTL) {
+    // expired
+    delete cache[locationId];
+    return { expired: true };
+  }
+  return { data: entry.data, age };
+}
+
+function setCached(locationId, data) {
+  cache[locationId] = { data, timestamp: Date.now() };
+  updateCacheSizeLabel();
+}
+
+function clearCache() {
+  for (const k in cache) delete cache[k];
+  updateCacheSizeLabel();
+  addLog('cache', '🗑', 'Cache cleared — all entries invalidated', 'hi-yellow');
+  updateStats();
+}
+
+function updateCacheSizeLabel() {
+  document.getElementById('cache-size-label').textContent =
+    `Cache: ${Object.keys(cache).length} entr${Object.keys(cache).length !== 1 ? 'ies' : 'y'}`;
+}
+
+/* ──────────────────────────────────────────────
+   3. MOCK MINDBODY API
+   Simulates REST API call with:
+   - Random latency 300–800ms
+   - 12% random failure rate
+   ────────────────────────────────────────────── */
+function mockMindbodyApiCall(locationId) {
+  return new Promise((resolve, reject) => {
+    const delay = 300 + Math.random() * 500;   // 300–800ms
+    const fails  = Math.random() < 0.12;        // 12% failure
+
+    setTimeout(() => {
+      if (fails) {
+        reject(new Error(`MBO API Error 503: Site ${locationId} unavailable`));
+      } else {
+        resolve(generateScheduleData(locationId));
+      }
+    }, delay);
+  });
+}
+
+function generateScheduleData(locationId) {
+  // Deterministic-ish but slightly random schedule per location
+  const seed = locationId.charCodeAt(4) || 1;
+  const classCount = 6 + (seed % 4);
+  const classes = [];
+  const usedTimes = new Set();
+
+  for (let i = 0; i < classCount; i++) {
+    let time;
+    do { time = CLASS_TIMES[Math.floor(Math.random() * CLASS_TIMES.length)]; }
+    while (usedTimes.has(time));
+    usedTimes.add(time);
+
+    const capacity = 18 + Math.floor(Math.random() * 8);
+    const booked   = Math.floor(Math.random() * capacity);
+    classes.push({
+      id:       `cls_${locationId}_${i}`,
+      time,
+      name:     CLASS_TYPES[Math.floor(Math.random() * CLASS_TYPES.length)],
+      trainer:  TRAINERS[Math.floor(Math.random() * TRAINERS.length)],
+      capacity,
+      booked,
+      duration: 50,
+    });
+  }
+  // Sort by time
+  classes.sort((a, b) => {
+    const toMin = t => {
+      const [h, m] = t.replace(' AM','').replace(' PM','').split(':').map(Number);
+      return (t.includes('PM') && h !== 12 ? h + 12 : h) * 60 + m;
+    };
+    return toMin(a.time) - toMin(b.time);
+  });
+  return classes;
+}
+
+/* ──────────────────────────────────────────────
+   4. INTERNAL API LAYER (wrapper)
+   - Checks cache first
+   - Retries up to 2 times on failure
+   - Returns fallback if all retries fail
+   - Fires tracking events
+   ────────────────────────────────────────────── */
+
+// Simple request queue for throttling spike simulation
+let activeRequests = 0;
+const MAX_CONCURRENT = 6;
+const requestQueue   = [];
+
+function enqueue(fn) {
+  return new Promise((resolve, reject) => {
+    requestQueue.push({ fn, resolve, reject });
+    processQueue();
+  });
+}
+
+function processQueue() {
+  while (activeRequests < MAX_CONCURRENT && requestQueue.length > 0) {
+    const { fn, resolve, reject } = requestQueue.shift();
+    activeRequests++;
+    fn()
+      .then(v => { activeRequests--; resolve(v); processQueue(); })
+      .catch(e => { activeRequests--; reject(e); processQueue(); });
+  }
+}
+
+// Stats counters
+const stats = { requests: 0, hits: 0, misses: 0, expired: 0, fallbacks: 0, errors: 0 };
+
+function updateStats() {
+  document.getElementById('total-requests').textContent = stats.requests;
+  document.getElementById('total-cached').textContent   = stats.hits;
+  document.getElementById('total-errors').textContent   = stats.errors;
+  document.getElementById('stat-hit').textContent  = stats.hits;
+  document.getElementById('stat-miss').textContent = stats.misses;
+  document.getElementById('stat-exp').textContent  = stats.expired;
+  document.getElementById('stat-fb').textContent   = stats.fallbacks;
+}
+
+// Fallback data used when all retries fail
+function getFallbackData(locationId) {
+  return [
+    { id: 'fallback_1', time: 'N/A', name: 'Power HIIT', trainer: 'Schedule Unavailable',
+      capacity: 20, booked: 0, duration: 50, isFallback: true },
+    { id: 'fallback_2', time: 'N/A', name: 'Strength & Conditioning', trainer: 'API temporarily offline',
+      capacity: 20, booked: 0, duration: 50, isFallback: true },
+  ];
+}
+
+async function fetchSchedule(locationId, opts = {}) {
+  stats.requests++;
+  updateStats();
+  fireTrackingEvent('schedule_fetch', locationId);
+
+  const t0 = performance.now();
+
+  // Check cache
+  const cached = getCached(locationId);
+
+  if (cached && !cached.expired) {
+    // CACHE HIT
+    stats.hits++;
+    updateStats();
+    const age = Math.round(cached.age / 1000);
+    addLog('cache', '✅', `Cache <span class="hi-green">HIT</span> — ${locationId} (age: ${age}s)`, 'hi-green');
+    fireTrackingEvent('cache_hit', locationId);
+    return { data: cached.data, source: 'cache', duration: performance.now() - t0 };
+  }
+
+  if (cached && cached.expired) {
+    // CACHE EXPIRED
+    stats.expired++;
+    updateStats();
+    addLog('cache', '♻️', `Cache <span class="hi-yellow">EXPIRED</span> — ${locationId} — re-fetching`, 'hi-yellow');
+  } else {
+    // CACHE MISS
+    stats.misses++;
+    updateStats();
+    addLog('cache', '🔍', `Cache <span class="hi-yellow">MISS</span> — ${locationId}`, 'hi-yellow');
+  }
+
+  // Fetch from "API" with up to 2 retries
+  const MAX_RETRIES = 2;
+  let lastError;
+
+  for (let attempt = 1; attempt <= MAX_RETRIES + 1; attempt++) {
+    try {
+      addLog('api', '📡', `Mindbody API call — site <span class="hi-blue">${locationId}</span> (attempt ${attempt})`, '');
+      const data = await enqueue(() => mockMindbodyApiCall(locationId));
+      const duration = performance.now() - t0;
+
+      // Success — store in cache
+      setCached(locationId, data);
+      addLog('api', '✅', `API response OK — ${locationId} — <span class="hi-green">${Math.round(duration)}ms</span>`, '');
+      fireTrackingEvent('schedule_load', locationId);
+      return { data, source: 'api', duration };
+
+    } catch (err) {
+      stats.errors++;
+      updateStats();
+      lastError = err;
+      addLog('error', '❌', `<span class="hi-red">API ERROR</span> — ${err.message}`, 'hi-red');
+
+      if (attempt <= MAX_RETRIES) {
+        addLog('api', '🔄', `Retry ${attempt}/${MAX_RETRIES} for ${locationId}…`, 'hi-orange');
+        await sleep(300 * attempt);  // backoff
+      }
+    }
+  }
+
+  // All retries exhausted — return fallback
+  stats.fallbacks++;
+  updateStats();
+  addLog('error', '🆘', `<span class="hi-red">FALLBACK DATA</span> served for ${locationId} — all retries failed`, 'hi-red');
+  fireTrackingEvent('api_fallback', locationId);
+  return { data: getFallbackData(locationId), source: 'fallback', duration: performance.now() - t0 };
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ──────────────────────────────────────────────
+   5. TRACKING / ANALYTICS SIMULATION
+   ────────────────────────────────────────────── */
+const trackingEvents = [];
+
+function fireTrackingEvent(event, locationId, extra = {}) {
+  const payload = {
+    event,
+    location_id: locationId,
+    timestamp: new Date().toISOString(),
+    utm_source: 'organic',
+    ...extra
+  };
+  trackingEvents.push(payload);
+  addLog('track', '📊', `GA4 Event: <span class="hi-purple">${event}</span> | <span class="hi-blue">${locationId}</span>`, '');
+  renderTrackingPill(event);
+}
+
+function renderTrackingPill(eventName) {
+  const container = document.getElementById('tracking-events');
+  const pill = document.createElement('div');
+  pill.className = 'track-pill';
+  pill.textContent = eventName;
+  container.prepend(pill);
+
+  // Keep only last 12
+  while (container.children.length > 12) {
+    container.removeChild(container.lastChild);
+  }
+}
+
+/* ──────────────────────────────────────────────
+   6. UI RENDERING
+   ────────────────────────────────────────────── */
+let currentLocationId = null;
+
+function renderLocationList() {
+  const list = document.getElementById('loc-list');
+  const openCount = CMS.locations.filter(l => l.status === 'open').length;
+  document.getElementById('open-count').textContent = `${openCount} Open`;
+
+  list.innerHTML = CMS.locations.map(loc => `
+    <div class="loc-item ${currentLocationId === loc.id ? 'active' : ''}"
+         onclick="selectLocation('${loc.id}')">
+      <div class="loc-name">${loc.name}</div>
+      <div class="loc-meta">
+        <span class="loc-status-pill ${loc.status === 'open' ? 'pill-open' : 'pill-presales'}">
+          ${loc.status === 'open' ? 'Open' : 'Presale'}
+        </span>
+        <span class="loc-tier">${loc.tier}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function selectLocation(id) {
+  currentLocationId = id;
+  renderLocationList();
+  const loc = CMS.locations.find(l => l.id === id);
+  addLog('track', '👁', `Location view — <span class="hi-blue">${loc.name}</span>`, '');
+  fireTrackingEvent('location_view', id);
+  renderLocationHeader(loc);
+
+  if (loc.status === 'presales') {
+    renderPresales(loc);
+  } else {
+    fetchCurrentLocation();
+  }
+}
+
+function renderLocationHeader(loc) {
+  const tier = CMS.pricingTiers[loc.tier];
+  const content = document.getElementById('main-content');
+
+  const headerHtml = loc.status === 'open' ? `
+    <div id="loc-header">
+      <div class="loc-icon">🏋️</div>
+      <div class="loc-info">
+        <div class="loc-title">${loc.name}</div>
+        <div class="loc-sub">${loc.city}, ${loc.state} · Site ID: ${loc.mindbody_site_id} · ${loc.tier}</div>
+        <div class="loc-stats">
+          <div class="mini-stat"><div class="mv">${loc.members}</div><div class="ml">Members</div></div>
+          <div class="mini-stat"><div class="mv">$${tier.monthly}</div><div class="ml">Monthly</div></div>
+          <div class="mini-stat"><div class="mv">$${tier.initiation}</div><div class="ml">Initiation</div></div>
+        </div>
+      </div>
+    </div>
+    <div id="req-status"></div>
+    <div id="schedule-grid"></div>
+  ` : '';
+
+  if (loc.status === 'open') {
+    content.innerHTML = headerHtml;
+  }
+
+  // Update panel badge
+  const badge = document.getElementById('panel-status-badge');
+  badge.className = `panel-badge ${loc.status === 'open' ? 'badge-green' : 'badge-yellow'}`;
+  badge.textContent = loc.status === 'open' ? `${loc.mindbody_site_id} · Live` : 'Presales Mode';
+}
+
+function renderPresales(loc) {
+  const content = document.getElementById('main-content');
+  content.innerHTML = `
+    <div class="presales-overlay">
+      <div class="po-title">🚀 Coming Soon</div>
+      <div class="po-sub">${loc.name} — Presales mode active</div>
+      <div style="margin-top:14px;font-size:11px;color:var(--text-dim);">
+        Opening timeline TBD · Waitlist forms active · Mindbody integration pending
+      </div>
+      <div style="margin-top:12px;">
+        <button class="btn btn-yellow" onclick="fireTrackingEvent('waitlist_join','${loc.id}');addLog('track','🎯','Waitlist CTA clicked — <span class=hi-purple>presales_join</span>','')">
+          Join Waitlist
+        </button>
+      </div>
+    </div>
+    <div style="margin-top:10px;font-size:10px;color:var(--text-dim);padding:0 4px;">
+      Pricing tier: <strong style="color:var(--accent)">${loc.tier}</strong> — 
+      $${CMS.pricingTiers[loc.tier].monthly}/mo after open
+    </div>
+  `;
+}
+
+async function fetchCurrentLocation() {
+  if (!currentLocationId) {
+    addLog('error', '⚠️', 'No location selected — please select from sidebar', 'hi-orange');
+    return;
+  }
+  const loc = CMS.locations.find(l => l.id === currentLocationId);
+  if (loc.status === 'presales') {
+    addLog('api', '⏸', `Schedule fetch skipped — ${loc.name} is in presales`, 'hi-yellow');
+    return;
+  }
+
+  setLoadingState();
+
+  const result = await fetchSchedule(currentLocationId);
+  renderSchedule(result);
+}
+
+function setLoadingState() {
+  const grid = document.getElementById('schedule-grid');
+  if (!grid) return;
+  grid.innerHTML = Array(6).fill(0).map(() =>
+    `<div class="skeleton skeleton-card"></div>`
+  ).join('');
+  const statusEl = document.getElementById('req-status');
+  if (statusEl) statusEl.innerHTML = `<span style="color:var(--text-dim)">⏳ Fetching from Mindbody API…</span>`;
+}
+
+function renderSchedule(result) {
+  const grid    = document.getElementById('schedule-grid');
+  const statusEl = document.getElementById('req-status');
+  if (!grid || !statusEl) return;
+
+  const { data, source, duration } = result;
+  const isFallback = source === 'fallback';
+
+  // Source badge
+  const badgeColors = { cache: 'hi-green', api: 'hi-blue', fallback: 'hi-red' };
+  const badgeTxt    = { cache: 'CACHE HIT', api: 'API', fallback: 'FALLBACK' };
+  statusEl.innerHTML = `
+    <span class="rs-chip ${source === 'cache' ? 'badge-green' : source === 'api' ? 'badge-blue' : 'badge-red'}">
+      ${badgeTxt[source]}
+    </span>
+    <span>${Math.round(duration)}ms</span>
+    ${isFallback ? '<span style="color:var(--red)">⚠ Live data unavailable</span>' : ''}
+  `;
+
+  // Fallback notice
+  let html = '';
+  if (isFallback) {
+    html += `
+      <div class="fallback-notice">
+        ⚠ Mindbody API unreachable after max retries — showing cached fallback data.
+        Schedule may be outdated. System monitoring alerted.
+      </div>
+    `;
+  }
+
+  // Class cards
+  html += data.map(cls => {
+    const spotsLeft = cls.capacity - cls.booked;
+    const pct       = (cls.booked / cls.capacity) * 100;
+    const barClass  = pct >= 90 ? 'full' : pct >= 70 ? 'warn' : '';
+    return `
+      <div class="class-card" onclick="handleBookClick('${cls.id}','${currentLocationId}')">
+        <div class="cc-time">${cls.time} · ${cls.duration}min</div>
+        <div class="cc-name">${cls.name}</div>
+        <div class="cc-trainer">${cls.trainer}</div>
+        <div class="cc-spots">
+          <div class="spots-bar-wrap">
+            <div class="spots-bar ${barClass}" style="width:${pct}%"></div>
+          </div>
+          <div class="spots-count">${spotsLeft} / ${cls.capacity}</div>
+        </div>
+        <button class="book-btn" ${cls.isFallback ? 'disabled' : ''}>
+          ${cls.isFallback ? 'Unavailable' : 'Book Session'}
+        </button>
+      </div>
+    `;
+  }).join('');
+
+  grid.innerHTML = html;
+}
+
+function handleBookClick(classId, locationId) {
+  addLog('track', '🎯', `Booking CTA — class <span class="hi-blue">${classId}</span>`, '');
+  fireTrackingEvent('booking_click', locationId, { class_id: classId });
+}
+
+/* ──────────────────────────────────────────────
+   7. TRAFFIC SPIKE SIMULATION
+   Fires 20 parallel requests across all locations
+   demonstrating throttling + caching
+   ────────────────────────────────────────────── */
+async function simulateTrafficSpike() {
+  const btn = document.getElementById('btn-spike');
+  btn.disabled = true;
+
+  const wrap = document.getElementById('spike-bar-wrap');
+  const bar  = document.getElementById('spike-bar');
+  wrap.style.display = 'block';
+  bar.style.width = '0%';
+
+  addLog('api', '🚀', `Traffic spike initiated — <span class="hi-orange">20 parallel requests</span> across all locations`, '');
+  fireTrackingEvent('traffic_spike_start', 'system');
+
+  const total = 20;
+  let completed = 0;
+
+  // Build 20 requests cycling through locations
+  const allLocs = CMS.locations.filter(l => l.status === 'open');
+  const requests = Array.from({ length: total }, (_, i) => {
+    const loc = allLocs[i % allLocs.length];
+    return fetchSchedule(loc.id)
+      .then(result => {
+        completed++;
+        bar.style.width = `${(completed / total) * 100}%`;
+        addLog('api', source2icon(result.source),
+          `Spike req ${completed}/${total} — ${loc.id} — <span class="${source2color(result.source)}">${result.source.toUpperCase()}</span> (${Math.round(result.duration)}ms)`, '');
+      })
+      .catch(err => {
+        completed++;
+        bar.style.width = `${(completed / total) * 100}%`;
+      });
+  });
+
+  await Promise.all(requests);
+
+  addLog('api', '✅', `Traffic spike complete — ${total} requests processed. Queue throttle: max ${MAX_CONCURRENT} concurrent.`, 'hi-green');
+  fireTrackingEvent('traffic_spike_end', 'system');
+
+  setTimeout(() => {
+    wrap.style.display = 'none';
+    bar.style.width = '0%';
+  }, 1500);
+
+  btn.disabled = false;
+}
+
+function source2icon(s) { return { cache: '✅', api: '📡', fallback: '🆘' }[s] || '·'; }
+function source2color(s) { return { cache: 'hi-green', api: 'hi-blue', fallback: 'hi-red' }[s] || ''; }
+
+/* ──────────────────────────────────────────────
+   8. CMS PANEL
+   ────────────────────────────────────────────── */
+let editingLocId = null;
+
+function openCmsPanel() {
+  if (!currentLocationId) {
+    addLog('error', '⚠️', 'Select a location first to edit CMS data', 'hi-orange');
+    return;
+  }
+  editingLocId = currentLocationId;
+  const loc = CMS.locations.find(l => l.id === editingLocId);
+  const panel = document.getElementById('cms-panel');
+  const container = document.getElementById('cms-fields-container');
+
+  container.innerHTML = `
+    <div class="cms-field">
+      <label>Location Name</label>
+      <input id="cms-name" value="${loc.name}" />
+    </div>
+    <div class="cms-field">
+      <label>City</label>
+      <input id="cms-city" value="${loc.city}" />
+    </div>
+    <div class="cms-field">
+      <label>Pricing Tier</label>
+      <select id="cms-tier">
+        ${Object.keys(CMS.pricingTiers).map(t =>
+          `<option ${loc.tier === t ? 'selected' : ''}>${t}</option>`).join('')}
+      </select>
+    </div>
+    <div class="cms-field">
+      <label>Status</label>
+      <select id="cms-status">
+        <option ${loc.status === 'open'     ? 'selected' : ''}>open</option>
+        <option ${loc.status === 'presales' ? 'selected' : ''}>presales</option>
+      </select>
+    </div>
+  `;
+
+  panel.style.display = 'block';
+  addLog('cache', '✏️', `CMS panel opened for <span class="hi-blue">${loc.id}</span>`, '');
+}
+
+function saveCmsData() {
+  if (!editingLocId) return;
+  const loc = CMS.locations.find(l => l.id === editingLocId);
+  const oldName = loc.name;
+
+  loc.name   = document.getElementById('cms-name').value;
+  loc.city   = document.getElementById('cms-city').value;
+  loc.tier   = document.getElementById('cms-tier').value;
+  loc.status = document.getElementById('cms-status').value;
+
+  // Invalidate cache for this location
+  if (cache[editingLocId]) {
+    delete cache[editingLocId];
+    updateCacheSizeLabel();
+    addLog('cache', '🗑', `Cache invalidated for <span class="hi-yellow">${editingLocId}</span> after CMS update`, 'hi-yellow');
+  }
+
+  addLog('cache', '💾', `CMS updated — <span class="hi-green">${oldName}</span> → <span class="hi-green">${loc.name}</span>`, '');
+  fireTrackingEvent('cms_update', editingLocId);
+
+  closeCmsPanel();
+  renderLocationList();
+
+  // Re-render if this is the active location
+  if (currentLocationId === editingLocId) {
+    renderLocationHeader(loc);
+    if (loc.status === 'presales') renderPresales(loc);
+    else fetchCurrentLocation();
+  }
+}
+
+function closeCmsPanel() {
+  document.getElementById('cms-panel').style.display = 'none';
+  editingLocId = null;
+}
+
+/* ──────────────────────────────────────────────
+   9. LOG SYSTEM
+   ────────────────────────────────────────────── */
+const logs = [];
+let logFilter = 'all';
+let logCount  = 0;
+
+function addLog(type, icon, msg, hiClass) {
+  const now = new Date();
+  const time = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+  logs.unshift({ type, icon, msg, time, id: logCount++ });
+  if (logs.length > 200) logs.pop();
+
+  document.getElementById('log-count').textContent = `${logs.length} events`;
+  renderLogs();
+}
+
+function renderLogs() {
+  const list = document.getElementById('log-list');
+  const filtered = logFilter === 'all' ? logs : logs.filter(l => l.type === logFilter);
+
+  list.innerHTML = filtered.slice(0, 80).map(l => `
+    <div class="log-entry">
+      <span class="log-time">${l.time}</span>
+      <span class="log-icon">${l.icon}</span>
+      <span class="log-msg">${l.msg}</span>
+    </div>
+  `).join('');
+}
+
+function setFilter(btn, filter) {
+  logFilter = filter;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderLogs();
+}
+
+function clearLogs() {
+  logs.length = 0;
+  logCount = 0;
+  document.getElementById('log-count').textContent = '0 events';
+  renderLogs();
+  addLog('cache', '🧹', 'Log cleared', '');
+}
+
+/* ──────────────────────────────────────────────
+   10. INITIALISE
+   ────────────────────────────────────────────── */
+function init() {
+  renderLocationList();
+  addLog('api',   '🟢', 'Platform Intelligence Dashboard <span class="hi-green">ONLINE</span> — v3.0', '');
+  addLog('api',   '📍', `${CMS.locations.length} locations loaded from CMS (${CMS.locations.filter(l=>l.status==='open').length} open, ${CMS.locations.filter(l=>l.status==='presales').length} presales)`, '');
+  addLog('cache', '💾', `In-memory cache initialized — TTL: ${CACHE_TTL/1000}s`, '');
+  addLog('api',   '🔒', `API throttle: max ${MAX_CONCURRENT} concurrent requests | Retry policy: 2 attempts + fallback`, '');
+  addLog('track', '📊', 'GA4 + Meta CAPI + TikTok Pixel tracking layer <span class="hi-purple">active</span>', '');
+  addLog('api',   '💡', 'Select a location → click <span class="hi-yellow">Fetch Schedule</span> to simulate live API call', '');
+
+  updateStats();
+
+  // Auto-select first open location after a short delay for demo feel
+  setTimeout(() => {
+    selectLocation(CMS.locations[0].id);
+  }, 600);
+}
+
+// Kick it off
+init();
+</script>
+</body>
+</html>
